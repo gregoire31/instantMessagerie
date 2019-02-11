@@ -1,5 +1,7 @@
 {
   "name": "MessagerieInstant",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }
