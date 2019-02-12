@@ -13,7 +13,10 @@ export class Tab1Page {
 
 
   constructor(private userService : UserService) {
-      
+      this.userService.getUserList().subscribe( (users) =>{
+        console.log(users)
+        this.users = users
+      })
    }
   ngOnInit() {
     let self = this

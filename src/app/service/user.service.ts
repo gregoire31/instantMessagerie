@@ -138,32 +138,26 @@ export class UserService {
 
   signup(emailRegister, passwordRegister, nomRegister) {
     let self = this
+    let photoURL =  "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg"
     this._auth
       .auth
       .createUserWithEmailAndPassword(emailRegister, passwordRegister)
       .then(
         (newUser) => {
+          self.addUserDetails(newUser.user.uid,nomRegister,photoURL) 
           this.presentToastWithOptionsWithMessage(nomRegister, "tertiary")
           console.log(newUser)
           newUser.user.updateProfile({
             displayName: nomRegister,
-            photoURL: "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg",
+            photoURL: photoURL,
           })
-          console.log(newUser.user.uid)
-          console.log(newUser.user.displayName)
-          console.log(newUser.user.photoURL)
-          self.uid = newUser.user.uid
-          self.displayName = newUser.user.displayName
-          self.avatar = newUser.user.photoURL
+          //console.log(newUser.user.uid)
+          //console.log(newUser.user.displayName)
+          //console.log(newUser.user.photoURL)
+          //self.uid = newUser.user.uid
+          //self.displayName = newUser.user.displayName
+          //self.avatar = newUser.user.photoURL
         })
-        
-         .then(() => {
-           //self.getCurrentUser().then((user)=> {
-           //  console.log(user)
-           //  self.addUserDetails(user.uid,user.displayName,user.photoURL) 
-           //})
-           self.addUserDetails(self.uid,self.displayName,self.avatar) 
-         })
 
         .then(function() {
           self.navigateTo('app')
@@ -176,6 +170,7 @@ export class UserService {
   navigateTo(url: string) {
     this.router.navigateByUrl(url);
   }
+
 
   login(email, password) {
     return this._auth
