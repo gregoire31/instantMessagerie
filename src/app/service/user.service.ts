@@ -4,6 +4,16 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import { Observable } from 'rxjs';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
+import { map } from 'rxjs/operators';
+
+
+export interface UserList {
+  id: string;
+  displayName: string;
+  avatar: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +21,24 @@ import { Router } from '@angular/router';
 export class UserService {
   userId: any
   user: Observable<any[]>
+  private usersCollection: AngularFirestoreCollection<UserList>;
+  private users: Observable<UserList[]>;
+  uid: string
+  displayName : string
+  avatar : string
 
-  constructor(public toastController: ToastController, private _auth: AngularFireAuth, private router:Router) {
+  constructor(public toastController: ToastController, private _auth: AngularFireAuth, private router:Router,db: AngularFirestore) {
+    this.usersCollection = db.collection<UserList>('users');
+    this.users = this.usersCollection.snapshotChanges().pipe(
+      map(actions => {
+        return actions.map(a => {
+          const data = a.payload.doc.data();
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        });
+      })
+    );
+
     firebase.auth().onAuthStateChanged(user => {
       if (user) { this.userId = user.uid}
     });
@@ -40,6 +66,32 @@ export class UserService {
     toast.present();
   }
 
+  getUserList(){
+    return this.users
+  }
+
+  getUserId(id) {
+    return this.usersCollection.doc<UserList>(id).valueChanges();
+  }
+ 
+  updateUser(todo: UserList, id: string) {
+    return this.usersCollection.doc(id).update(todo);
+  }
+ 
+  addUser(todo: UserList) {
+    return this.usersCollection.add(todo);
+  }
+  addUserDetails(id:string, displayName: string, avatar : string) {
+    return this.usersCollection.add({
+      id: id,
+      displayName: displayName,
+      avatar: avatar
+    })
+  }
+ 
+  removeUser(id) {
+    return this.usersCollection.doc(id).delete();
+  }
 
   getCurrentUser() {
     return new Promise<any>((resolve, reject) => {
@@ -68,6 +120,7 @@ export class UserService {
     )
   }
 
+
   //get currentUser() {
   //  return this._auth.authState
   //    .pipe(switchMap(auth => auth ? this.getUserById(auth.uid) : of(null)));
@@ -84,6 +137,7 @@ export class UserService {
   }
 
   signup(emailRegister, passwordRegister, nomRegister) {
+    let self = this
     this._auth
       .auth
       .createUserWithEmailAndPassword(emailRegister, passwordRegister)
@@ -95,9 +149,24 @@ export class UserService {
             displayName: nomRegister,
             photoURL: "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg",
           })
-          this.navigateTo('app')
-          
-          
+          console.log(newUser.user.uid)
+          console.log(newUser.user.displayName)
+          console.log(newUser.user.photoURL)
+          self.uid = newUser.user.uid
+          self.displayName = newUser.user.displayName
+          self.avatar = newUser.user.photoURL
+        })
+        
+         .then(() => {
+           //self.getCurrentUser().then((user)=> {
+           //  console.log(user)
+           //  self.addUserDetails(user.uid,user.displayName,user.photoURL) 
+           //})
+           self.addUserDetails(self.uid,self.displayName,self.avatar) 
+         })
+
+        .then(function() {
+          self.navigateTo('app')
         })
       .catch(err => {
         this.presentToastWithOptionsWithMessage(err.message, "warning")
@@ -126,6 +195,5 @@ export class UserService {
   logout() {
     return this._auth.auth.signOut();
   }
-
 
 }
