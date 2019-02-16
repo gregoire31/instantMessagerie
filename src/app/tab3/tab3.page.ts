@@ -8,42 +8,39 @@ import { UserService } from '../service/user.service';
 })
 export class Tab3Page {
 
-  users : any[]
+  users : any
   userName : string
   avatar : string
   userId : string
   //userName = "toto"
-  users2 : any[]
+  displayName: string
 
   constructor(private userService : UserService) {
     let self = this
-    this.userService.getUserList().subscribe( (users) =>{
-      console.log(users)
-      self.users2 = users
-    })
+
    }
 
-  ngOnInit() {
+   ngOnInit() {
     let self = this
-    this.userService.getCurrentUser().then(function(user)  {
-      self.users = user
+    
+    this.userService.getCurrentUser().then(function (user) {
+      console.log(user)
       self.userId = user.uid
-      self.userName = user.displayName
-      self.avatar = user.photoURL
-    })
+    }).then(() => {
+      this.userService.getUserId(this.userId).subscribe(user => {
+        console.log(user.displayName)
+        this.avatar = user.avatar
+        this.displayName = user.displayName
+        self.users = user
+      })
+    }
+    )
   }
 
-  save() {
-    //this.userService.listAllUsers()
-    let idAExtraire : string
-    console.log(this.users)
-    this.users2.map( user => {
-      if (user.uid === this.userId){
-        idAExtraire = user.id
-      }
-    })
-    this.userService.updateUserDetails(idAExtraire,this.userName,this.avatar)
+  save(){
+    this.userService.updateUserDetail(this.userId,this.displayName,this.avatar)
   }
+
 
   logout(){
     this.userService.logout()

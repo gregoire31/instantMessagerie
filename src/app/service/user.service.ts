@@ -6,12 +6,10 @@ import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { map } from 'rxjs/operators';
-import { defineBase } from '@angular/core/src/render3';
-//import * as admin from "firebase-admin";
 
 
 export interface UserList {
-  uid: string;
+  id: string;
   displayName: string;
   avatar: string;
 }
@@ -24,18 +22,17 @@ export class UserService {
   userId: any
   user: Observable<any[]>
   private usersCollection: AngularFirestoreCollection<UserList>;
-  private users: Observable<any[]>;
+  private users: Observable<UserList[]>;
   uid: string
-  displayName: string
-  avatar: string
+  displayName : string
+  avatar : string
 
-  constructor(public toastController: ToastController, private _auth: AngularFireAuth, private router: Router, db: AngularFirestore) {
+  constructor(public toastController: ToastController, private _auth: AngularFireAuth, private router:Router,db: AngularFirestore) {
     this.usersCollection = db.collection<UserList>('users');
     this.users = this.usersCollection.snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data();
-          console.log(a.payload.doc.id)
           const id = a.payload.doc.id;
           return { id, ...data };
         });
@@ -43,9 +40,9 @@ export class UserService {
     );
 
     firebase.auth().onAuthStateChanged(user => {
-      if (user) { this.userId = user.uid }
+      if (user) { this.userId = user.uid}
     });
-
+    
   }
   async presentToastWithOptions() {
     const toast = await this.toastController.create({
@@ -60,7 +57,7 @@ export class UserService {
 
   async presentToastWithOptionsWithMessage(message: string, color: string) {
     const toast = await this.toastController.create({
-      message: `Content de vous revoir ${message}`,
+      message: `Bienvenue ${message}`,
       showCloseButton: true,
       position: 'top',
       closeButtonText: 'Ok',
@@ -69,66 +66,41 @@ export class UserService {
     toast.present();
   }
 
-  // listAllUsers() {
-  //   // List batch of users, 1000 at a time.
-  //   admin.auth().listUsers(1000)
-  //     .then(function(listUsersResult) {
-  //       listUsersResult.users.forEach(function(userRecord) {
-  //         console.log("user", userRecord.toJSON());
-  //       });
-  //     })
-  //     .catch(function(error) {
-  //       console.log("Error listing users:", error);
-  //     });
-  // }
-
-
-
-  getUserList() {
+  getUserList(){
     return this.users
-  }
-
-  getIdExtract(uid : string){
-    
   }
 
   getUserId(id) {
     return this.usersCollection.doc<UserList>(id).valueChanges();
   }
-
+ 
   updateUser(todo: UserList, id: string) {
     return this.usersCollection.doc(id).update(todo);
   }
 
-  updateUserDetails(id: string, displayName: string, avatar: string) {
-
-    this.usersCollection.doc(id).set({
+  updateUserDetail(id: string, displayName:string, avatar:string) {
+    console.log("Enregistré")
+    this.navigateTo('app')
+    return this.usersCollection.doc(id).set({
+      id:id,
       displayName: displayName,
       avatar: avatar
     })
-    firebase.auth().onAuthStateChanged(function (user) {
-      if (user) {
-        user.updateProfile({
-          displayName: displayName,
-          photoURL: avatar,
-        })
-      } else {
-        // No user is signed in.
-      }
-    })
+    
   }
-
+ 
   addUser(todo: UserList) {
     return this.usersCollection.add(todo);
   }
-  addUserDetails(id: string, displayName: string, avatar: string) {
-    return this.usersCollection.add({
-      uid: id,
+  
+  addUserDetails(id:string, displayName: string, avatar : string) {
+    return this.usersCollection.doc(id).set({
+      id: id,
       displayName: displayName,
       avatar: avatar
     })
   }
-
+ 
   removeUser(id) {
     return this.usersCollection.doc(id).delete();
   }
@@ -144,14 +116,13 @@ export class UserService {
       })
     })
   }
-
   returnUser(): Observable<any> {
     return this.user
   }
 
   get currentUser() {
     return (
-      firebase.auth().onAuthStateChanged(function (user) {
+      firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
           return user
         } else {
@@ -179,13 +150,13 @@ export class UserService {
 
   signup(emailRegister, passwordRegister, nomRegister) {
     let self = this
-    let photoURL = "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg"
+    let photoURL =  "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg"
     this._auth
       .auth
       .createUserWithEmailAndPassword(emailRegister, passwordRegister)
       .then(
         (newUser) => {
-          self.addUserDetails(newUser.user.uid, nomRegister, photoURL)
+          self.addUserDetails(newUser.user.uid,nomRegister,photoURL) 
           this.presentToastWithOptionsWithMessage(nomRegister, "tertiary")
           console.log(newUser)
           newUser.user.updateProfile({
@@ -200,9 +171,9 @@ export class UserService {
           //self.avatar = newUser.user.photoURL
         })
 
-      .then(function () {
-        self.navigateTo('app')
-      })
+        .then(function() {
+          self.navigateTo('app')
+        })
       .catch(err => {
         this.presentToastWithOptionsWithMessage(err.message, "warning")
       });
@@ -220,7 +191,6 @@ export class UserService {
       .then(value => {
         console.log(value);
         console.log(value.user.displayName)
-        this.presentToastWithOptionsWithMessage(value.user.displayName, "tertiary")
         this.navigateTo('app')
       })
       .catch(err => {

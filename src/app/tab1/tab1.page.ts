@@ -9,23 +9,27 @@ import { UserService } from '../service/user.service';
 export class Tab1Page {
   users : any[]
   userName : String
-  //userName = "toto"
-  users2 : any[]
+  userId : string
+
 
 
   constructor(private userService : UserService) {
-      let self = this
       this.userService.getUserList().subscribe( (users) =>{
         console.log(users)
-        self.users2 = users
+        this.users = users
       })
    }
   ngOnInit() {
     let self = this
     this.userService.getCurrentUser().then(function(user)  {
       console.log(user)
-      self.userName = user.displayName
-      self.users = user
+      self.userId = user.uid
+    }).then(()=>{
+      console.log(this.userId)
+      this.userService.getUserId(this.userId).subscribe(user => {
+        console.log(user)
+        this.userName = user.displayName
+      })
     })
   }
 
