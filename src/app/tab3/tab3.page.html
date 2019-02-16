@@ -6,4 +6,40 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content></ion-content>
+<ion-content>
+
+  <ion-list>
+    <ion-item >
+      <ion-grid>
+        <ion-row>
+          <ion-col size="2">
+            <ion-avatar>
+              <img [src]="avatar">
+            </ion-avatar>
+          </ion-col>
+          <ion-col size="10">
+            <div class="text">
+              <ion-input type="text" [(ngModel)]="userName"></ion-input>
+            </div>
+
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+  </ion-list>
+
+  <div class="buttonCustom">
+      <ion-button shape="round" color="tertiary" (click)="save()">
+          <ion-icon name="checkmark-circle"></ion-icon> Save
+      </ion-button>
+    </div>
+
+
+  <div class="buttonCustom">
+    <ion-button shape="round" color="primary" (click)="logout()">
+      <ion-icon name="log-out"></ion-icon> Logout
+    </ion-button>
+  </div>
+
+
+</ion-content>
