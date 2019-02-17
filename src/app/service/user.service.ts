@@ -96,8 +96,7 @@ export class UserService {
       }
 
       return self.channelCollection.doc(docRef.id).collection('users').doc(id).set(isAdmin)
-    })
-      .catch(function (error) {
+    }).catch(function (error) {
         console.error("Error adding document: ", error);
       });
   }
@@ -134,7 +133,28 @@ export class UserService {
   }
 
   addUserToChannel(idChannel: string, idUser: string) {
+    let isAdmin =  {
+      isAdmin: false
+    }
+    this.channelCollection.doc(idChannel).collection('users').doc(idUser).set(isAdmin)
+  }
 
+  changeAdminModeUser(idChannel:string, idUser : string){
+    
+    let isAdmin =  {
+      isAdmin: true
+    }
+
+    this.channelCollection.doc(idChannel).collection('users').doc(idUser).set(isAdmin)
+  }
+
+  returnListChannelOfCurrentUser(id:string){
+    //return this.channelCollection.snapshotChanges().pipe(
+    //  map(actions => {
+    //    console.log(actions)
+    //  })
+    //);
+    return this.usersCollection.doc(id).collection("channel").valueChanges()
   }
 
   //updateChannelUser(){

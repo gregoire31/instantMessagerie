@@ -10,8 +10,22 @@
   <div class="textCenter">
     <ion-input type="text" [(ngModel)]="channelName"></ion-input>
   </div>
+  <ion-item *ngFor="let channel of channels">
+    <ion-grid>
+      <ion-row>
+
+        <ion-col size="12">
+          <div class="userNameText">
+            <ion-label>{{channel.nom}}</ion-label>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-item>
 
   <ion-button shape="round" color="primary" (click)="createChannel()"> Creer Channel</ion-button>
 
+  <ion-button shape="round" color="primary" (click)="returnListChannelOfCurrentUser()"> tester retour channel</ion-button>
+  
 
 </ion-content>

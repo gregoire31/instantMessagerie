@@ -15,12 +15,15 @@ export class Tab2Page {
   channelName: string
   displayName : string
   userList : any
+  channels : any
 
   constructor(private userService : UserService) {
     this.userService.getUserList().subscribe( (users) =>{
       console.log(users)
       this.userList = users
     })
+
+
 
    }
 
@@ -38,7 +41,15 @@ export class Tab2Page {
         self.users = user
       })
     }
-    )
+    ).then(() => {
+      this.userService.returnListChannelOfCurrentUser(this.userId).subscribe(function(channels){
+        //channels.map(channel => {
+        //  this.channels = channel
+        //})
+        self.channels = channels
+      })
+    })
+
   }
 
   createChannel() {
