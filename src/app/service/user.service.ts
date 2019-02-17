@@ -6,12 +6,14 @@ import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { map } from 'rxjs/operators';
+import { Identifiers } from '@angular/compiler';
 
 
 export interface UserList {
   id: string;
   displayName: string;
   avatar: string;
+  channel: any[]
 }
 
 
@@ -23,12 +25,15 @@ export class UserService {
   user: Observable<any[]>
   private usersCollection: AngularFirestoreCollection<UserList>;
   private users: Observable<UserList[]>;
+  private channelCollection: AngularFirestoreCollection<any>;
+  private channels: Observable<any[]>;
   uid: string
-  displayName : string
-  avatar : string
+  displayName: string
+  avatar: string
 
-  constructor(public toastController: ToastController, private _auth: AngularFireAuth, private router:Router,db: AngularFirestore) {
+  constructor(public toastController: ToastController, private _auth: AngularFireAuth, private router: Router, db: AngularFirestore) {
     this.usersCollection = db.collection<UserList>('users');
+    this.channelCollection = db.collection<any>('channel')
     this.users = this.usersCollection.snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
@@ -40,9 +45,9 @@ export class UserService {
     );
 
     firebase.auth().onAuthStateChanged(user => {
-      if (user) { this.userId = user.uid}
+      if (user) { this.userId = user.uid }
     });
-    
+
   }
   async presentToastWithOptions() {
     const toast = await this.toastController.create({
@@ -66,41 +71,92 @@ export class UserService {
     toast.present();
   }
 
-  getUserList(){
+  getUserList() {
     return this.users
+  }
+
+  createChannel(id: string, nom: string) {
+
+    let self = this
+    return this.channelCollection.add({
+      name: nom
+    }).then(function (docRef) {
+      //console.log(docRef.id)
+      let channel: any
+      channel = {
+        id: docRef.id,
+        nom: nom
+      }
+      self.addChannelToAdminUser(id, channel)
+      return docRef
+    }).then(function (docRef) {
+
+      let isAdmin =  {
+        isAdmin: true
+      }
+
+      return self.channelCollection.doc(docRef.id).collection('users').doc(id).set(isAdmin)
+    })
+      .catch(function (error) {
+        console.error("Error adding document: ", error);
+      });
   }
 
   getUserId(id) {
     return this.usersCollection.doc<UserList>(id).valueChanges();
   }
- 
+
   updateUser(todo: UserList, id: string) {
     return this.usersCollection.doc(id).update(todo);
   }
 
-  updateUserDetail(id: string, displayName:string, avatar:string) {
+  updateUserDetail(id: string, displayName: string, avatar: string) {
     console.log("Enregistré")
     this.navigateTo('app')
-    return this.usersCollection.doc(id).set({
-      id:id,
+    return this.usersCollection.doc(id).update({
+      id: id,
       displayName: displayName,
       avatar: avatar
     })
-    
+
   }
- 
+
+  //addChanneNewUser(id: string, channel : any){
+  //  return this.usersCollection.doc(id).update({
+  //    channel : channel
+  //  })
+  //}
+  addChannelToAdminUser(id: string, channel: any) {
+    // //return firebase.database().ref(id).push(channel)
+    // console.log(this.usersCollection.doc(id).collection('channel'))
+    console.log(id)
+    return this.usersCollection.doc(id).collection('channel').add(channel)
+  }
+
+  addUserToChannel(idChannel: string, idUser: string) {
+
+  }
+
+  //updateChannelUser(){
+  //  this.usersCollection.doc(id).collection('channel').doc(myBookId).set({
+  //    password: this.password,
+  //    name: this.name,
+  //    rollno: this.rollno
+  //  })
+  //}
+
   addUser(todo: UserList) {
     return this.usersCollection.add(todo);
   }
-  
-  addUserDetails(id:string, displayName: string, avatar : string) {
+
+  addUserDetails(id: string, displayName: string, avatar: string) {
     return this.usersCollection.doc(id).set({
       id: id,
       displayName: displayName,
       avatar: avatar
     })
   }
- 
+
   removeUser(id) {
     return this.usersCollection.doc(id).delete();
   }
@@ -122,7 +178,7 @@ export class UserService {
 
   get currentUser() {
     return (
-      firebase.auth().onAuthStateChanged(function(user) {
+      firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
           return user
         } else {
@@ -150,13 +206,13 @@ export class UserService {
 
   signup(emailRegister, passwordRegister, nomRegister) {
     let self = this
-    let photoURL =  "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg"
+    let photoURL = "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg"
     this._auth
       .auth
       .createUserWithEmailAndPassword(emailRegister, passwordRegister)
       .then(
         (newUser) => {
-          self.addUserDetails(newUser.user.uid,nomRegister,photoURL) 
+          self.addUserDetails(newUser.user.uid, nomRegister, photoURL)
           this.presentToastWithOptionsWithMessage(nomRegister, "tertiary")
           console.log(newUser)
           newUser.user.updateProfile({
@@ -171,9 +227,9 @@ export class UserService {
           //self.avatar = newUser.user.photoURL
         })
 
-        .then(function() {
-          self.navigateTo('app')
-        })
+      .then(function () {
+        self.navigateTo('app')
+      })
       .catch(err => {
         this.presentToastWithOptionsWithMessage(err.message, "warning")
       });

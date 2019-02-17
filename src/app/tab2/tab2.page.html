@@ -6,4 +6,12 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content></ion-content>
+<ion-content>
+  <div class="textCenter">
+    <ion-input type="text" [(ngModel)]="channelName"></ion-input>
+  </div>
+
+  <ion-button shape="round" color="primary" (click)="createChannel()"> Creer Channel</ion-button>
+
+
+</ion-content>
