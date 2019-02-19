@@ -3,10 +3,9 @@ import * as firebase from 'firebase/app'
 import { AngularFireAuth } from 'angularfire2/auth';
 import { Observable } from 'rxjs';
 import { ToastController } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { map } from 'rxjs/operators';
-import { Identifiers } from '@angular/compiler';
 
 
 export interface UserList {
@@ -31,7 +30,14 @@ export class UserService {
   displayName: string
   avatar: string
 
-  constructor(public toastController: ToastController, private _auth: AngularFireAuth, private router: Router, db: AngularFirestore) {
+  constructor(
+    public toastController: ToastController, 
+    private _auth: AngularFireAuth, 
+    private router: Router, 
+    db: AngularFirestore,
+    public activatedRoute: ActivatedRoute
+    ) {
+
     this.usersCollection = db.collection<UserList>('users');
     this.channelCollection = db.collection<any>('channel')
     this.users = this.usersCollection.snapshotChanges().pipe(
@@ -95,7 +101,9 @@ export class UserService {
         isAdmin: true
       }
 
-      return self.channelCollection.doc(docRef.id).collection('users').doc(id).set(isAdmin)
+      self.channelCollection.doc(docRef.id).collection('users').doc(id).set(isAdmin)
+      console.log(docRef)
+      return docRef.id
     }).catch(function (error) {
         console.error("Error adding document: ", error);
       });
@@ -120,6 +128,10 @@ export class UserService {
 
   }
 
+  listeTextMessage(idChannel : string){
+    return this.channelCollection.doc(idChannel).collection('users')
+  }
+
   //addChanneNewUser(id: string, channel : any){
   //  return this.usersCollection.doc(id).update({
   //    channel : channel
@@ -133,10 +145,10 @@ export class UserService {
   }
 
   addUserToChannel(idChannel: string, idUser: string) {
-    let isAdmin =  {
+    let isNotAdmin =  {
       isAdmin: false
     }
-    this.channelCollection.doc(idChannel).collection('users').doc(idUser).set(isAdmin)
+    this.channelCollection.doc(idChannel).collection('users').doc(idUser).set(isNotAdmin)
   }
 
   changeAdminModeUser(idChannel:string, idUser : string){
@@ -155,6 +167,17 @@ export class UserService {
     //  })
     //);
     return this.usersCollection.doc(id).collection("channel").valueChanges()
+  }
+
+  returnDetailsChannel(id : string){
+    return this.channelCollection.doc(id).valueChanges()
+  }
+
+  addMessageToChannel(idChannel : string, idUser : string, message :string){
+    let messageAEntrer =  {
+      message : message
+    }
+    return this.channelCollection.doc(idChannel).collection("users").doc(idUser).collection("messages").add(messageAEntrer)
   }
 
   //updateChannelUser(){
@@ -224,6 +247,7 @@ export class UserService {
     })
   }
 
+
   signup(emailRegister, passwordRegister, nomRegister) {
     let self = this
     let photoURL = "https://www.gettyimages.ie/gi-resources/images/Homepage/Hero/UK/CMS_Creative_164657191_Kingfisher.jpg"
@@ -257,6 +281,10 @@ export class UserService {
 
   navigateTo(url: string) {
     this.router.navigateByUrl(url);
+  }
+
+  navigateWithoutUrl(url : any){
+    this.router.navigate(url)
   }
 
 

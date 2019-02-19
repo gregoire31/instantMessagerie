@@ -10,6 +10,7 @@ export class Tab1Page {
   users : any[]
   userName : String
   userId : string
+  entry : any
 
 
 
@@ -31,6 +32,10 @@ export class Tab1Page {
         this.userName = user.displayName
       })
     })
+  }
+
+  addUserToChannel(id : string) {
+    console.log(id)
   }
 
   logout(){

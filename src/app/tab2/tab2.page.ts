@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { UserService } from '../service/user.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-tab2',
@@ -17,7 +18,7 @@ export class Tab2Page {
   userList : any
   channels : any
 
-  constructor(private userService : UserService) {
+  constructor(private userService : UserService, public activatedRoute: ActivatedRoute) {
     this.userService.getUserList().subscribe( (users) =>{
       console.log(users)
       this.userList = users
@@ -52,9 +53,18 @@ export class Tab2Page {
 
   }
 
-  createChannel() {
-    this.userService.createChannel(this.userId, this.channelName)
+  //createChannel() {
+  //  this.userService.createChannel(this.userId, this.channelName)
+  //}
+  //navigateByUrl(id : string){
+  //  this.userService.navigateTo(`app/tabs/channelCreate/${id}`);
+  //}
+
+  navigateByUrl(){
+    this.userService.navigateTo(`app/tabs/newChannelCreate`);
   }
 
+
+  //<ion-button href="/app/tabs/channelCreate/{{channel.id}}">ouvre nouveau channel</ion-button>
 
 }

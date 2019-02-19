@@ -20,7 +20,7 @@
           </ion-col>
           <ion-col size="10">
             <div class="userNameText">
-              <ion-label>{{user.displayName}}</ion-label>
+              <ion-label (click)="addUserToChannel(user.id)">{{user.displayName}}</ion-label>
             </div>
           </ion-col>
         </ion-row>

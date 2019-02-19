@@ -36,6 +36,39 @@ const routes: Routes = [
           }
         ]
       },
+
+      {
+        path: 'channelCreate/:channelId',
+        children: [
+          {
+            path: '',
+            loadChildren: '../channel-creation/channel-creation.module#ChannelCreationPageModule'
+          }
+        ]
+      },
+
+      {
+        path: 'newChannelCreate',
+        children: [
+          {
+            path: '',
+            loadChildren: '../channel-creation/channel-creation.module#ChannelCreationPageModule'
+          }
+        ]
+      },
+
+
+      {
+        path: 'textMessage/:channelId',
+        children: [
+          {
+            path: '',
+            loadChildren: '../text-message/text-message.module#TextMessagePageModule'
+          }
+        ]
+      },
+
+
       {
         path: '',
         redirectTo: 'tabs/tab1',
