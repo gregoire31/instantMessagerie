@@ -87,17 +87,13 @@ export class UserService {
     return this.channelCollection.add({
       name: nom
     }).then(function (docRef) {
-      //console.log(docRef.id)
-      let channel: any
-      channel = {
-        id: docRef.id,
-        nom: nom
-      }
-      self.addChannelToAdminUser(id, channel)
+
+      self.addChannelToAdminUser(id, docRef.id, nom)
       return docRef
     }).then(function (docRef) {
 
       let isAdmin =  {
+        nom: nom,
         isAdmin: true
       }
 
@@ -137,15 +133,33 @@ export class UserService {
   //    channel : channel
   //  })
   //}
-  addChannelToAdminUser(id: string, channel: any) {
+
+  addChannelToAdminUser(id: string, idChannel: string, nom : string) {
     // //return firebase.database().ref(id).push(channel)
     // console.log(this.usersCollection.doc(id).collection('channel'))
     console.log(id)
-    return this.usersCollection.doc(id).collection('channel').add(channel)
+    let isNotAdmin =  {
+      nom : nom,
+      isAdmin: true
+    }
+    return this.usersCollection.doc(id).collection('channels').doc(idChannel).set(isNotAdmin)
   }
 
-  addUserToChannel(idChannel: string, idUser: string) {
+
+  addChannelToUser(id: string, idChannel: string, nom : string) {
+    // //return firebase.database().ref(id).push(channel)
+    // console.log(this.usersCollection.doc(id).collection('channel'))
+    console.log(id)
     let isNotAdmin =  {
+      nom : nom,
+      isAdmin: false
+    }
+    return this.usersCollection.doc(id).collection('channels').doc(idChannel).set(isNotAdmin)
+  }
+
+  addUserToChannel(idChannel: string, idUser: string, nameChannel : string) {
+    let isNotAdmin =  {
+      nom : nameChannel,
       isAdmin: false
     }
     this.channelCollection.doc(idChannel).collection('users').doc(idUser).set(isNotAdmin)
@@ -166,7 +180,8 @@ export class UserService {
     //    console.log(actions)
     //  })
     //);
-    return this.usersCollection.doc(id).collection("channel").valueChanges()
+    console.log(id)
+    return this.usersCollection.doc(id).collection("channels").valueChanges()
   }
 
   returnDetailsChannel(id : string){
