@@ -28,9 +28,9 @@ export class TextMessagePage implements OnInit {
       self.userId = user.uid
     })
 
-    console.log(this.userService.listeTextMessage(this.channelId).valueChanges().subscribe((data)=>{
+    this.userService.listeTextMessage(this.channelId).valueChanges().subscribe((data)=>{
       console.log(data)
-    }))
+    })
   }
 
 

@@ -11,14 +11,31 @@ export class Tab1Page {
   userName : String
   userId : string
   entry : any
-
-
+  userModified : any
 
   constructor(private userService : UserService) {
+    let self = this
       this.userService.getUserList().subscribe( (users) =>{
-        console.log(users)
-        this.users = users
-      })
+        self.users = users
+        users.map(user => {
+          console.log(user)
+        })
+        //this.userModified = users
+        //let longeurUsers = users.length
+        //for(let i = 0 ; i < longeurUsers ; i++){
+        //  this.userModified[i].avatar = users[i].avatar
+        //  this.userModified[i].displayName = users[i].displayName
+        //  this.userModified[i].id = users[i].id
+        //  this.userModified[i].isChecked = false
+        //}
+        //this.users = users
+        //users.map((user) => {
+        //  let userBis = user
+        //  self.userModified.push({...user})
+        //}
+        //)
+      
+    })
    }
   ngOnInit() {
     let self = this

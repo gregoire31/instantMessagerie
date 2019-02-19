@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../service/user.service';
+import { type } from 'os';
+import { stringify } from '@angular/core/src/render3/util';
 
 @Component({
   selector: 'app-channel-creation',
@@ -14,10 +16,17 @@ export class ChannelCreationPage implements OnInit {
   userId : string
   userDisplayName : string
   nameChannel : string
+  users : any
   constructor(public activatedRoute: ActivatedRoute, private userService : UserService) {}
 
   ngOnInit() {
     let self = this
+    this.userService.getUserList().subscribe( (users) =>{
+      self.users = users
+      users.map(user => {
+        console.log(user)
+      })
+    })
     //this.channelId = this.activatedRoute.snapshot.paramMap.get('channelId');
     //console.log(this.channelId)
     this.userService.getCurrentUser().then(function(user)  {
@@ -32,8 +41,17 @@ export class ChannelCreationPage implements OnInit {
   }
 
 
-  crerChannel(){
+
+  crerNewChannel(){
     this.userService.createChannel(this.userId,this.nameChannel).then((channelId) => {
+      //let channelIdString = stringify(channelId)
+      //console.log(channelIdString)
+      let channelIdString = String(channelId)
+      this.users.map(user => {
+        if(user.isChecked === true){
+          this.userService.addUserToChannel(channelIdString,user.id)
+        }
+      })
       this.userService.navigateTo(`app/tabs/textMessage/${channelId}`)
     })
   }
