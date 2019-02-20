@@ -13,11 +13,14 @@ export class Tab1Page {
   entry : any
   userModified : any
   usersFriends : any[]=[]
+  donneeSearchbar : string=""
+  userNameListFilter : any[]
 
   constructor(private userService : UserService) {
     let self = this
       this.userService.getUserList().subscribe( (users) =>{
         self.users = users
+        self.userNameListFilter = users
         users.map(user => {
           console.log(user)
         })
@@ -64,6 +67,24 @@ export class Tab1Page {
       })
     })
   }
+
+  getItems(){
+    console.log("Salut tout le monde")
+  }
+
+  onSearchInput($event){
+    let valueInput = $event.detail.value
+    console.log(valueInput)
+
+    const search = valueInput;
+  
+    if (!search) return this.users;
+
+    //this.userNameListFilter.push({... this.users.filter(c => c.displayName.toLowerCase().indexOf(valueInput) > -1)})
+    this.userNameListFilter = this.users.filter(c => c.displayName.toLowerCase().indexOf(valueInput) > -1)
+  }
+
+
 
   testerFriendsData(){
     console.log(this.usersFriends)
