@@ -145,6 +145,14 @@ export class UserService {
     return this.usersCollection.doc(id).collection('channels').doc(idChannel).set(isNotAdmin)
   }
 
+  addFriendsToUsers(idCurrentUser : string, idUserAAjouter){
+    let isFriend = {
+      isFriend : true
+    }
+    this.usersCollection.doc(idCurrentUser).collection('amis').doc(idUserAAjouter).set(isFriend)
+    this.usersCollection.doc(idUserAAjouter).collection('amis').doc(idCurrentUser).set(isFriend)
+  }
+
 
   addChannelToUser(id: string, idChannel: string, nom : string) {
     // //return firebase.database().ref(id).push(channel)

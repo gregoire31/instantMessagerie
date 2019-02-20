@@ -55,6 +55,14 @@ export class Tab1Page {
     console.log(id)
   }
 
+  addfriend(){
+    this.users.map(user => {
+      if(user.isChecked === true){
+        this.userService.addFriendsToUsers(this.userId,user.id)
+      }
+    })
+  }
+
   logout(){
     this.userService.logout()
   }
