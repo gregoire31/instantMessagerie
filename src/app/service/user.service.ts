@@ -173,6 +173,18 @@ export class UserService {
     this.channelCollection.doc(idChannel).collection('users').doc(idUser).set(isNotAdmin)
   }
 
+  friendListe(id : string){
+    return this.usersCollection.doc(id).collection("amis").snapshotChanges().pipe(
+      map(actions => {
+        return actions.map(a => {
+          const data = a.payload.doc.data();
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        });
+      })
+    );
+  }
+
   changeAdminModeUser(idChannel:string, idUser : string){
     
     let isAdmin =  {
@@ -189,7 +201,15 @@ export class UserService {
     //  })
     //);
     console.log(id)
-    return this.usersCollection.doc(id).collection("channels").valueChanges()
+    return this.usersCollection.doc(id).collection("channels").snapshotChanges().pipe(
+      map(actions => {
+        return actions.map(a => {
+          const data = a.payload.doc.data();
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        });
+      })
+    );
   }
 
   returnDetailsChannel(id : string){

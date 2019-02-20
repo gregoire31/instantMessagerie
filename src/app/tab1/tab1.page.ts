@@ -12,6 +12,7 @@ export class Tab1Page {
   userId : string
   entry : any
   userModified : any
+  usersFriends : any[]=[]
 
   constructor(private userService : UserService) {
     let self = this
@@ -36,7 +37,9 @@ export class Tab1Page {
         //)
       
     })
+
    }
+
   ngOnInit() {
     let self = this
     this.userService.getCurrentUser().then(function(user)  {
@@ -48,7 +51,22 @@ export class Tab1Page {
         console.log(user)
         this.userName = user.displayName
       })
+    }).then(()=>{
+      //self.usersFriends = []
+      this.userService.friendListe(this.userId).subscribe((friends)=>{
+        //console.log(friends)
+        //this.usersFriends = friends
+        friends.map(friend => {
+          self.userService.getUserId(friend.id).subscribe(data => {
+            self.usersFriends.push({... data})
+          })
+        })
+      })
     })
+  }
+
+  testerFriendsData(){
+    console.log(this.usersFriends)
   }
 
   addUserToChannel(id : string) {

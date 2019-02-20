@@ -44,6 +44,7 @@ export class Tab2Page {
     }
     ).then(() => {
       this.userService.returnListChannelOfCurrentUser(this.userId).subscribe(function(channels){
+        console.log(channels)
         channels.map(channel => {
           console.log(channel)
         })
