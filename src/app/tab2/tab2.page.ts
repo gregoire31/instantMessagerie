@@ -64,6 +64,9 @@ export class Tab2Page {
   navigateByUrl(){
     this.userService.navigateTo(`app/tabs/newChannelCreate`);
   }
+  navigateByUrlTxt(id : string){
+    this.userService.navigateTo(`app/tabs/textMessage/${id}`);
+  }
 
 
   //<ion-button href="/app/tabs/channelCreate/{{channel.id}}">ouvre nouveau channel</ion-button>

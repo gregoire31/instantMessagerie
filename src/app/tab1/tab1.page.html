@@ -30,7 +30,7 @@
           </ion-col>
         </ion-row>
       </ion-grid>
-      <ion-checkbox slot="end" [(ngModel)]="user.isChecked" ></ion-checkbox>
+      <ion-checkbox *ngIf="user.canAdd" slot="end" [(ngModel)]="user.isChecked" ></ion-checkbox>
     </ion-item>
 
 
@@ -63,7 +63,7 @@
   </ion-list>
 
   <div class="logoutButton">
-    <ion-button shape="round" color="primary" (click)="testerFriendsData()">
+    <ion-button shape="round" color="primary">
       <ion-icon name="log-out"></ion-icon> tester Friends
     </ion-button>
   </div>

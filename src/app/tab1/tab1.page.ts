@@ -15,48 +15,36 @@ export class Tab1Page {
   usersFriends : any[]=[]
   donneeSearchbar : string=""
   userNameListFilter : any[]
+  idFriends : any[]=[]
 
   constructor(private userService : UserService) {
     let self = this
-      this.userService.getUserList().subscribe( (users) =>{
-        self.users = users
-        self.userNameListFilter = users
-        users.map(user => {
-          console.log(user)
-        })
-        //this.userModified = users
-        //let longeurUsers = users.length
-        //for(let i = 0 ; i < longeurUsers ; i++){
-        //  this.userModified[i].avatar = users[i].avatar
-        //  this.userModified[i].displayName = users[i].displayName
-        //  this.userModified[i].id = users[i].id
-        //  this.userModified[i].isChecked = false
-        //}
-        //this.users = users
-        //users.map((user) => {
-        //  let userBis = user
-        //  self.userModified.push({...user})
-        //}
-        //)
+
+
       
-    })
+    
 
    }
 
   ngOnInit() {
     let self = this
     this.userService.getCurrentUser().then(function(user)  {
-      console.log(user)
+      //console.log(user)
       self.userId = user.uid
-    }).then(()=>{
-      console.log(this.userId)
+    })
+    .then(()=>{
+      //console.log(this.userId)
       this.userService.getUserId(this.userId).subscribe(user => {
-        console.log(user)
+        //console.log(user)
         this.userName = user.displayName
       })
     }).then(()=>{
       //self.usersFriends = []
       this.userService.friendListe(this.userId).subscribe((friends)=>{
+        friends.map(friend => {
+          this.idFriends.push(friend.id);
+        })
+
         //console.log(friends)
         //this.usersFriends = friends
         friends.map(friend => {
@@ -64,8 +52,27 @@ export class Tab1Page {
             self.usersFriends.push({... data})
           })
         })
+
       })
+    }).then(()=>{
+      console.log(this.idFriends)
+      this.userService.getUserList().subscribe( (users) =>{
+        
+        self.users = users
+        self.userNameListFilter = users
+        users.map(user => {
+          console.log(user.id)
+
+              //if(this.idFriends.indexOf(user.id) > -1 === true){
+              //  console.log(true)
+              //}
+              if(this.idFriends.indexOf(user.id) > -1 === false){
+                user.canAdd = true
+              }
+          
+        })
     })
+  })
   }
 
   getItems(){
@@ -91,6 +98,7 @@ export class Tab1Page {
   }
 
   addUserToChannel(id : string) {
+
     console.log(id)
   }
 

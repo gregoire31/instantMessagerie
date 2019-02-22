@@ -6,6 +6,7 @@ import { ToastController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { map } from 'rxjs/operators';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 
 export interface UserList {
@@ -35,7 +36,8 @@ export class UserService {
     private _auth: AngularFireAuth, 
     private router: Router, 
     db: AngularFirestore,
-    public activatedRoute: ActivatedRoute
+    public activatedRoute: ActivatedRoute,
+    private localNotifications: LocalNotifications
     ) {
 
     this.usersCollection = db.collection<UserList>('users');
@@ -78,7 +80,15 @@ export class UserService {
   }
 
   getUserList() {
-    return this.users
+    return this.usersCollection.snapshotChanges().pipe(
+      map(actions => {
+        return actions.map(a => {
+          const data = a.payload.doc.data();
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        });
+      })
+    );
   }
 
   createChannel(id: string, nom: string) {
@@ -124,9 +134,18 @@ export class UserService {
 
   }
 
-  listeTextMessage(idChannel : string){
-    return this.channelCollection.doc(idChannel).collection('users')
+  pushNotification() {
+    this.localNotifications.schedule({
+      id: this.userId,
+      title: 'New user',
+      text: 'New User',
+      foreground: true,
+      //sound: isAndroid? 'file://sound.mp3': 'file://beep.caf',
+      sound: 'file://sound.mp3',
+      //data: { secret: key } 
+    });
   }
+
 
   //addChanneNewUser(id: string, channel : any){
   //  return this.usersCollection.doc(id).update({
@@ -145,7 +164,7 @@ export class UserService {
     return this.usersCollection.doc(id).collection('channels').doc(idChannel).set(isNotAdmin)
   }
 
-  addFriendsToUsers(idCurrentUser : string, idUserAAjouter){
+  addFriendsToUsers(idCurrentUser : string, idUserAAjouter : string){
     let isFriend = {
       isFriend : true
     }
@@ -216,13 +235,34 @@ export class UserService {
     return this.channelCollection.doc(id).valueChanges()
   }
 
-  addMessageToChannel(idChannel : string, idUser : string, message :string){
+  addMessageToChannel(idChannel : string, idUser : string, message :string, date:Date){
+    console.log("ID CHANNEL : " + idChannel + "ID User : " + idUser + "message : " + message + "date : " + date)
     let messageAEntrer =  {
-      message : message
+      idUser : idUser,
+      message : message,
+      date : date
     }
-    return this.channelCollection.doc(idChannel).collection("users").doc(idUser).collection("messages").add(messageAEntrer)
+    return this.channelCollection.doc(idChannel).collection("messages").add(messageAEntrer)
   }
 
+  listeAllUsersOfChannels (idChannel : string){
+    return this.channelCollection.doc(idChannel).collection("users")
+  }
+
+  listeAllMessageOfAChannel(idChannel : string) {
+      return this.channelCollection.doc(idChannel).collection("messages").snapshotChanges().pipe(
+        map(actions => {
+          return actions.map(a => {
+            const data = a.payload.doc.data();
+            const id = a.payload.doc.id;
+            return { id, ...data };
+          });
+        })
+      );
+    }
+  
+  
+  
   //updateChannelUser(){
   //  this.usersCollection.doc(id).collection('channel').doc(myBookId).set({
   //    password: this.password,
@@ -290,6 +330,8 @@ export class UserService {
     })
   }
 
+
+  
 
   signup(emailRegister, passwordRegister, nomRegister) {
     let self = this

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../service/user.service';
 
+
 @Component({
   selector: 'app-text-message',
   templateUrl: './text-message.page.html',
@@ -28,7 +29,7 @@ export class TextMessagePage implements OnInit {
       self.userId = user.uid
     })
 
-    this.userService.listeTextMessage(this.channelId).valueChanges().subscribe((data)=>{
+    this.userService.listeAllMessageOfAChannel(this.channelId).subscribe((data)=>{
       console.log(data)
     })
   }
@@ -36,7 +37,8 @@ export class TextMessagePage implements OnInit {
 
   TextSubmit(){
     console.log(this.channelId)
-    this.userService.addMessageToChannel(this.channelId,this.userId,this.textMsg)
+    let date = new Date();
+    this.userService.addMessageToChannel(this.channelId,this.userId,this.textMsg,date)
   }
 
 }

@@ -15,11 +15,13 @@ export class ChannelCreationPage implements OnInit {
   userDisplayName : string
   nameChannel : string
   users : any
-  constructor(public activatedRoute: ActivatedRoute, private userService : UserService) {}
+  constructor(public activatedRoute: ActivatedRoute, private userService : UserService) {
+  }
 
   ngOnInit() {
     let self = this
     this.userService.getUserList().subscribe( (users) =>{
+      console.log(users)
       self.users = users
       users.map(user => {
         console.log(user)
@@ -48,10 +50,6 @@ export class ChannelCreationPage implements OnInit {
       this.users.map(user => {
         if(user.isChecked === true){
           this.userService.addUserToChannel(channelIdString,user.id,this.nameChannel)
-          let channel = {
-            id:channelIdString,
-            nom: this.nameChannel
-          }
           this.userService.addChannelToUser(user.id,channelIdString,this.nameChannel)
         }
       })

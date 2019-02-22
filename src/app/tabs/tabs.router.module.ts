@@ -38,16 +38,6 @@ const routes: Routes = [
       },
 
       {
-        path: 'channelCreate/:channelId',
-        children: [
-          {
-            path: '',
-            loadChildren: '../channel-creation/channel-creation.module#ChannelCreationPageModule'
-          }
-        ]
-      },
-
-      {
         path: 'newChannelCreate',
         children: [
           {
