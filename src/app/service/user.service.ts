@@ -6,7 +6,6 @@ import { ToastController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { map } from 'rxjs/operators';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 
 export interface UserList {
@@ -43,8 +42,7 @@ export class UserService {
     private _auth: AngularFireAuth, 
     private router: Router, 
     db: AngularFirestore,
-    public activatedRoute: ActivatedRoute,
-    private localNotifications: LocalNotifications
+    public activatedRoute: ActivatedRoute
     ) {
 
     this.usersCollection = db.collection<UserList>('users');
@@ -141,17 +139,7 @@ export class UserService {
 
   }
 
-  pushNotification() {
-    this.localNotifications.schedule({
-      id: this.userId,
-      title: 'New user',
-      text: 'New User',
-      foreground: true,
-      //sound: isAndroid? 'file://sound.mp3': 'file://beep.caf',
-      sound: 'file://sound.mp3',
-      //data: { secret: key } 
-    });
-  }
+
 
 
   //addChanneNewUser(id: string, channel : any){
