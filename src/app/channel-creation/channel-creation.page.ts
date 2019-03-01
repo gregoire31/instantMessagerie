@@ -18,6 +18,12 @@ export class ChannelCreationPage implements OnInit {
   constructor(public activatedRoute: ActivatedRoute, private userService : UserService) {
   }
 
+  //returnDetailsChannel(id : string){
+  //  return this.channelCollection.doc(id).valueChanges()
+  //}
+
+  
+
   ngOnInit() {
     let self = this
     this.userService.getUserList().subscribe( (users) =>{

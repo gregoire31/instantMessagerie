@@ -66,9 +66,9 @@ export class Tab1Page {
               //if(this.idFriends.indexOf(user.id) > -1 === true){
               //  console.log(true)
               //}
-              if(this.idFriends.indexOf(user.id) > -1 === false){
-                user.canAdd = true
-              }
+              //if(this.idFriends.indexOf(user.id) > -1 === false){
+              //  user.canAdd = true
+              //}
           
         })
     })

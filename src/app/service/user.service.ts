@@ -16,6 +16,13 @@ export interface UserList {
   channel: any[]
 }
 
+interface Message {
+  id : string,
+  idUser : string,
+  message : string,
+  avatar : string
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -42,15 +49,15 @@ export class UserService {
 
     this.usersCollection = db.collection<UserList>('users');
     this.channelCollection = db.collection<any>('channel')
-    this.users = this.usersCollection.snapshotChanges().pipe(
-      map(actions => {
-        return actions.map(a => {
-          const data = a.payload.doc.data();
-          const id = a.payload.doc.id;
-          return { id, ...data };
-        });
-      })
-    );
+    //this.users = this.usersCollection.snapshotChanges().pipe(
+    //  map(actions => {
+    //    return actions.map(a => {
+    //      const data = a.payload.doc.data();
+    //      const id = a.payload.doc.id;
+    //      return { id, ...data };
+    //    });
+    //  })
+    //);
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) { this.userId = user.uid }
@@ -191,6 +198,7 @@ export class UserService {
     }
     this.channelCollection.doc(idChannel).collection('users').doc(idUser).set(isNotAdmin)
   }
+  
 
   friendListe(id : string){
     return this.usersCollection.doc(id).collection("amis").snapshotChanges().pipe(
@@ -235,12 +243,13 @@ export class UserService {
     return this.channelCollection.doc(id).valueChanges()
   }
 
-  addMessageToChannel(idChannel : string, idUser : string, message :string, date:Date){
-    console.log("ID CHANNEL : " + idChannel + "ID User : " + idUser + "message : " + message + "date : " + date)
+  addMessageToChannel(idChannel : string, idUser : string, message :string, date:Date, avatar : string){
+    console.log("ID CHANNEL : " + idChannel + "ID User : " + idUser + "message : " + message + "date : " + date + "avatar : "+ avatar)
     let messageAEntrer =  {
       idUser : idUser,
       message : message,
-      date : date
+      date : date,
+      avatar : avatar
     }
     return this.channelCollection.doc(idChannel).collection("messages").add(messageAEntrer)
   }
@@ -249,8 +258,8 @@ export class UserService {
     return this.channelCollection.doc(idChannel).collection("users")
   }
 
-  listeAllMessageOfAChannel(idChannel : string) {
-      return this.channelCollection.doc(idChannel).collection("messages").snapshotChanges().pipe(
+  listeAllMessageOfAChannel(idChannel : string, numberResult : number) {
+      return this.channelCollection.doc(idChannel).collection("messages", ref => ref.orderBy('date').limit(numberResult)).snapshotChanges().pipe(
         map(actions => {
           return actions.map(a => {
             const data = a.payload.doc.data();
